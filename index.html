@@ -1,1 +1,184 @@
-<h1>Hello<h1>  
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Equity ROI Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      padding: 30px;
+      color: #333;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      background: #1e88e5;
+      color: white;
+      padding: 12px;
+      margin: -25px -25px 20px -25px;
+      border-radius: 10px 10px 0 0;
+      font-size: 20px;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+    input[type=range], select {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .output {
+      font-weight: bold;
+      color: #1a5276;
+    }
+    .result {
+      margin-top: 15px;
+      padding: 10px;
+      background: #eaf2f8;
+      border-radius: 5px;
+    }
+    .highlight {
+      background: #fff3e0;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .netroi {
+      background: #ffebee;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .weget {
+      background: #bbdefb;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      color: #0d47a1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: right;
+      border-bottom: 1px solid #ddd;
+    }
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+    thead {
+      background: #1e88e5;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Equity ROI Calculator</h2>
+    <label for="plan">Select Plan</label>
+    <select id="plan" onchange="calculate()">
+      <option value="20000">PRIME</option>
+      <option value="25000" selected>PRIME+</option>
+      <option value="40000">ELITE</option>
+      <option value="50000">ELITE+</option>
+      <option value="120000">SUPREME+</option>
+      <option value="150000">ZENITH</option>
+      <option value="60000">MULTIBAGGER VISION</option>
+      <option value="60000">NRI CONNECT</option>
+      <option value="400000">INSTITUTIONAL EDGE</option>
+    </select>
+
+    <label for="exposure">Capital Exposure: ₹<span class="output" id="expVal">500000</span></label>
+    <input type="range" id="exposure" min="500000" max="10000000" step="50000" value="500000" oninput="calculate()">
+
+    <label for="upside">Expected Upside (%): <span class="output" id="upVal">30%</span></label>
+    <input type="range" id="upside" min="5" max="100" step="1" value="30" oninput="calculate()">
+
+    <div class="result">
+      <p><b>Earnings:</b> ₹<span id="earnings">150000</span></p>
+      <p><b>End of Term:</b> ₹<span id="endTerm">650000</span></p>
+      <p><b>Subscription:</b> ₹<span id="subFee">25000</span></p>
+      <p><b>GST (18%):</b> ₹<span id="gstVal">4500</span></p>
+      <p><b>Net Subscription:</b> ₹<span id="netSub">29500</span></p>
+      <p><b>STCG Tax (20%):</b> ₹<span id="stcg">30000</span></p>
+      <p><b>Total Cost:</b> ₹<span id="totalCost">59500</span></p>
+
+      <p class="highlight">Net Returns: ₹<span id="netReturns">90500</span></p>
+      <p class="netroi">Net ROI: <span id="netRoi">18.10%</span></p>
+      <p class="weget">What we get: <span id="rsEarning">3.85%</span></p>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Historical Returns Comparison</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Asset Class</th>
+          <th>Annualized Return</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Nifty</td><td>15%</td></tr>
+        <tr><td>FD</td><td>7%</td></tr>
+        <tr><td>MF</td><td>13%</td></tr>
+        <tr><td>Gold</td><td>14.40%</td></tr>
+        <tr style="background:#e8f5e9;font-weight:bold;"><td>Equity</td><td><span id="equityReturn">--%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <script>
+    function calculateEquityReturn(earnings, exposure, netSubscription) {
+      return ((earnings - netSubscription) / exposure) * 100;
+    }
+
+    function calculate() {
+      const exposure = +document.getElementById("exposure").value;
+      const upside = +document.getElementById("upside").value;
+      const subFee = +document.getElementById("plan").value;
+
+      const earnings = exposure * (upside / 100);
+      const endTerm = exposure + earnings;
+      const gst = subFee * 0.18;
+      const netSubscription = subFee + gst;
+      const stcg = earnings * 0.20;
+      const totalCost = netSubscription + stcg;
+      const netReturns = earnings - totalCost;
+      const netRoi = (netReturns / exposure) * 100;
+      const rsEarning = (subFee / (exposure + earnings)) * 100;
+      const equityReturn = calculateEquityReturn(earnings, exposure, netSubscription);
+
+      document.getElementById("expVal").textContent = exposure.toLocaleString();
+      document.getElementById("upVal").textContent = upside + "%";
+      document.getElementById("earnings").textContent = earnings.toLocaleString();
+      document.getElementById("endTerm").textContent = endTerm.toLocaleString();
+      document.getElementById("subFee").textContent = subFee.toLocaleString();
+      document.getElementById("gstVal").textContent = gst.toLocaleString();
+      document.getElementById("netSub").textContent = netSubscription.toLocaleString();
+      document.getElementById("stcg").textContent = stcg.toLocaleString();
+      document.getElementById("totalCost").textContent = totalCost.toLocaleString();
+      document.getElementById("netReturns").textContent = netReturns.toLocaleString();
+      document.getElementById("netRoi").textContent = netRoi.toFixed(2) + "%";
+      document.getElementById("rsEarning").textContent = rsEarning.toFixed(2) + "%";
+      document.getElementById("equityReturn").textContent = equityReturn.toFixed(2) + "%";
+    }
+
+    calculate();
+  </script>
+</body>
+</html>
+
